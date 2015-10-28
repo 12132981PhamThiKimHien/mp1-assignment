@@ -77,13 +77,9 @@ public:
 	void nodeLoopOps();
 	int isNullAddress(Address *addr);
 	Address getJoinAddress();
-	void initMemberListTable(Member *memberNode, int, short);
+	void initMemberListTable(Member *memberNode);
 	void printAddress(Address *addr);
 	virtual ~MP1Node();
-
-	void LogMemberList();
-	void SendHBSomewhere(Address*, long);
-	bool UpdateMemberList(Address*, long);
 };
 
 #endif /* _MP1NODE_H_ */

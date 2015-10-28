@@ -108,7 +108,7 @@ int MP1Node::initThisNode(Address *joinaddr) {
 	memberNode->heartbeat = 0;
 	memberNode->pingCounter = TFAIL;
 	memberNode->timeOutCounter = -1;
-    initMemberListTable(memberNode, id, port);
+    initMemberListTable(memberNode);
 
     return 0;
 }
@@ -251,7 +251,7 @@ bool MP1Node::recvCallBack(void *env, char *data, int size ) {
         }
 }
 
-Address AddressFromMLE(MemberListEntry* mle){
+Address AddressFromMLE(MemberListEntry& mle){
 	Address a;
         memcpy(a.addr, &mle->id, sizeof(int));
         memcpy(&a.addr[4], &mle->port, sizeof(short));
@@ -386,33 +386,6 @@ void MP1Node::LogMemberList(){
         	msg << it->getid() << ": " << it->getheartbeat() << "(" << it->gettimestamp() << "), ";
     	}
     	msg << "]";
-}
-
-void MP1Node::SendHBSomewhere(Address *src_addr, long heartbeat){
-	int k=30;
-    	double prob = k / (double)memberNode->memberList.size();
-
-    	MessageHdr *msg;
-
-    	size_t msgsize = sizeof(MessageHdr) + sizeof(src_addr->addr) + sizeof(long) + 1;
-    	msg = (MessageHdr *) malloc(msgsize * sizeof(char));
-    
-    	msg->msgType = PING;
-    	memcpy((char *)(msg+1), src_addr->addr, sizeof(src_addr->addr));
-    	memcpy((char *)(msg+1) + sizeof(src_addr->addr) + 1, &heartbeat, sizeof(long));
-
-    	for(vector<MemberListEntry>::iterator it = memberNode->memberList.begin(); it != memberNode->memberList.end(); it++) {
-        	Address dst_addr = AddressFromMLE(&(*it));
-        	if ((dst_addr == memberNode->addr) == 0 || ((dst_addr == *src_addr) ==0 )) {
-            		continue;
-        	}
-        	if ((((double)(rand() % 100))/100) < prob) {
-            		emulNet->ENsend(&memberNode->addr, &dst_addr, (char *)msg, msgsize);
-        	}else{
-
-        	}
-    	}
-    	free(msg);
 }
 
 /**
